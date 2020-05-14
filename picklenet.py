@@ -1,12 +1,11 @@
+import os as _os
 import io as _io
-import tempfile
+import tempfile as _tempfile
 
 import clr as _clr
-_clr.AddReference('System')
 _clr.AddReference('System.Runtime')
 _clr.AddReference('System.Runtime.Serialization')
 _clr.AddReference('System.Runtime.Serialization.Formatters')
-import System as _sysnet
 import System.IO as _ionet
 import System.Runtime.Serialization as _ser
 import System.Runtime.Serialization.Formatters.Binary as _bin
@@ -32,13 +31,14 @@ def get_formatter(protocol_or_class_or_formatter='binary'):
 
 
 def dump(obj, fp, formatter='binary') -> None:
-    name = tempfile.mktemp()
+    name = _tempfile.mktemp()
     outfp = _ionet.FileStream(name, 2, 3)
     formatter = get_formatter(formatter)
     formatter.Serialize(outfp, obj)
     outfp.Flush()
     fp.write(open(name, 'rb').read())
-
+    # _os.unlink(name)
+    
 
 def dumps(obj, formatter='binary') -> bytes:
     stream = _io.BytesIO()
@@ -47,11 +47,13 @@ def dumps(obj, formatter='binary') -> bytes:
 
 
 def load(fp, formatter='binary'):
-    name = tempfile.mktemp()
+    name = _tempfile.mktemp()
     open(name, 'wb').write(fp.read())
     fp = _ionet.FileStream(name, 3, 1)
     formatter = get_formatter(formatter)
-    return formatter.Deserialize(fp)
+    res = formatter.Deserialize(fp)
+    # _os.unlink(name)
+    return res
 
 
 def loads(data, formatter='binary'):
