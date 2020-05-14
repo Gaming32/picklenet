@@ -1,0 +1,4 @@
+.vscode
+setup.cmd
+build
+picklenet.egg-info
